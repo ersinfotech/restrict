@@ -1,0 +1,15 @@
+{
+  "name": "restrict",
+  "version": "0.0.0",
+  "description": "ers auth middleware",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jarvisaoieong",
+  "license": "MIT",
+  "dependencies": {
+    "superagent": "^0.21.0",
+    "underscore": "^1.7.0"
+  }
+}

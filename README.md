@@ -4,13 +4,13 @@ ERS auth middleware
 
 ## Installation
 
-```
+```sh
 $ npm i --save ersinfotech/restrict
 ```
 
 ## API
 
-```
+```js
 var express = require('express');
 var Restrict = require('restrict');
 

@@ -1,6 +1,6 @@
 {
   "name": "restrict",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "ers auth middleware",
   "main": "index.js",
   "scripts": {

@@ -1,5 +1,5 @@
 {
-  "name": "restrict",
+  "name": "@ersinfotech/restrict",
   "version": "0.0.1",
   "description": "ers auth middleware",
   "main": "index.js",

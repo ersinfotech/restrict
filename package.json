@@ -1,6 +1,6 @@
 {
   "name": "@ersinfotech/restrict",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "ers auth middleware",
   "main": "index.js",
   "scripts": {

@@ -41,28 +41,7 @@ module.exports = function Restrict(options) {
             accessToken: access_token,
           })
 
-          if (!permission) {
-            return next()
-          }
-
-          // 檢本permission
-          return request({
-            url: baseUrl + '/account/me/permissions',
-            qs: { access_token: access_token },
-            json: true,
-          }).then(function(body) {
-            var permissions = (req.session.permissions = body)
-
-            if (!_.isArray(permissions)) {
-              permissions = _.keys(permissions)
-            }
-
-            if (!_.contains(permissions, permission)) {
-              return res.status(400).send({ error: 'permission required' })
-            }
-
-            next()
-          })
+          return next()
         })
         .catch(function(err) {
           res.status(400).send({ error: 'access_token invalid' })

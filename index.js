@@ -31,13 +31,7 @@ module.exports = function Restrict(options) {
           var data = body || {}
           req.session = req.session || {}
 
-          _.extend(req.session, {
-            userId: String(data.user_id),
-            groupId: String(data.group_id),
-            productId: String(data.product_id),
-            roleId: String(data.role_id),
-            lang: data.lang,
-            paid: data.paid,
+          _.extend(req.session, data, {
             accessToken: access_token,
           })
 

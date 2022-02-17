@@ -22,14 +22,9 @@ module.exports = function Restrict(options) {
       extra_data = extra_data || {}
       req.session = {
         ...req.session,
+        ...extra_data,
         userId: user_id,
         clientId: client_id,
-        productId: extra_data.productId || client_id,
-        groupId: extra_data.groupId,
-        roleId: extra_data.roleId,
-        lang: extra_data.lang,
-        paid: extra_data.paid,
-        updateFbHits: extra_data.updateFbHits,
       }
       next()
     })
@@ -41,7 +36,10 @@ module.exports = function Restrict(options) {
     return function restrictHandler(req, res, next) {
       var access_token
 
-      if (req.query.access_token) {
+      if (req.handshake) {
+        access_token = req.handshake.access_token
+        next = res
+      } else if (req.query.access_token) {
         access_token = req.query.access_token
       } else if ((req.headers.authorization || '').indexOf('Bearer ') == 0) {
         access_token = req.headers.authorization.replace('Bearer', '').trim()

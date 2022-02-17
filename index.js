@@ -1,12 +1,40 @@
 var _ = require('underscore')
 var request = require('request-promise')
+var { OAuth2Provider } = require('oauth2-provider')
 
 module.exports = function Restrict(options) {
   options = options || {}
   var baseUrl = options.baseUrl
+  var oauthSetting = options.oauth
+  var oauth
 
-  if (!baseUrl) {
-    throw new Error('baseUrl required in restrict middleware')
+  if (oauthSetting) {
+    oauth = new OAuth2Provider(oauthSetting)
+    oauth.on('access_token', (req, info, next) => {
+      var { user_id, client_id, grant_date, extra_data } = info
+      if (
+        grant_date.getTime() +
+          (oauthSetting.accessTokenTTL || 12 * 60 * 60 * 1000) <
+        Date.now()
+      ) {
+        return next(new Error('access_token timeout'))
+      }
+      extra_data = extra_data || {}
+      req.session = {
+        ...req.session,
+        userId: user_id,
+        clientId: client_id,
+        productId: extra_data.productId || client_id,
+        groupId: extra_data.groupId,
+        roleId: extra_data.roleId,
+        lang: extra_data.lang,
+        paid: extra_data.paid,
+        updateFbHits: extra_data.updateFbHits,
+      }
+      next()
+    })
+  } else if (!baseUrl) {
+    throw new Error('oauth or baseUrl required in restrict middleware')
   }
 
   return function restrict(permission) {
@@ -21,25 +49,28 @@ module.exports = function Restrict(options) {
         return res.status(400).send({ error: 'access_token required' })
       }
 
-      // 檢查token有效性，獲得用戶id信息
-      request({
-        url: baseUrl + '/account/me/id',
-        qs: { access_token: access_token },
-        json: true,
+      req.session = req.session || {}
+      _.extend(req.session, {
+        accessToken: access_token,
       })
-        .then(function(body) {
-          var data = body || {}
-          req.session = req.session || {}
 
-          _.extend(req.session, data, {
-            accessToken: access_token,
+      if (oauth) {
+        oauth.login()(req, res, next)
+      } else {
+        request({
+          url: baseUrl + '/account/me/id',
+          qs: { access_token: access_token },
+          json: true,
+        })
+          .then(function (body) {
+            var data = body || {}
+            _.extend(req.session, data)
+            return next()
           })
-
-          return next()
-        })
-        .catch(function(err) {
-          res.status(400).send({ error: 'access_token invalid' })
-        })
+          .catch(function (err) {
+            res.status(400).send({ error: 'access_token invalid' })
+          })
+      }
     }
   }
 }

@@ -12,12 +12,19 @@ $ npm i --save ersinfotech/restrict
 
 ```js
 var express = require('express');
-var Restrict = require('restrict');
+var Restrict = require('@ersinfotech/restrict');
 
 var app = express();
-var restrict = Restrict({baseUrl: 'http://authUrl'});
+var restrict = Restrict({
+	baseUrl: 'http://authUrl',
+	oauth: {
+		crypt_key: 'crypt_key'
+		sign_key: 'sign_key'
+		accessTokenTTL: 12 * 60 * 60 * 1000
+	},
+});
 
-app.use(restrict('some permission'));
+app.use(restrict());
 ```
 
 ## License
